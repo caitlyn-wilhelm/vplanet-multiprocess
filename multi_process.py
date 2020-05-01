@@ -16,11 +16,11 @@ def get_VSPACE(input_file,project_dir):
     destList = []
     os.chdir(project_dir)
     vsl = open(input_file, 'r')
+
     for line in vsl:
-        project_dir= vsl.readlines()[0]
-        line.strip().split('/n')
-        vspace_name = line.split()
-        vsf = open(vspace_name, 'r+')
+        vspace_name = line.strip().split('/n')[0]
+        print(vspace_name)
+        vsf = open(vspace_name, 'r')
         vspace_all = vsf.readlines()
         check = vspace_all[3]
         destLine = vspace_all[1]
@@ -31,6 +31,8 @@ def get_VSPACE(input_file,project_dir):
             rand_dist(destfolder, vspace_name)
         else:
             os.system('vspace ' + vspace_name)
+        vsf.close()
+    vsl.close()
     return destList
 
 # --------------------------------------------------------------------
@@ -171,12 +173,9 @@ def multiProcess(srcDir, cores):
 
 def main():
     project_dir = sys.argv[1]
-    cores = sys.argv[2]
-    if cores > mp.cpu_count():
-        print("Error: the cores given are above number of actual cores")
-        print("Actual amount of cores: " + str(mp.cpu_count()))
+    cores = int(sys.argv[2])
 
-    dirList = get_VSPACE('vplanet-multiprocess/vspace_list',project_dir)
+    dirList = get_VSPACE('vplanet-multiprocess/vspace_list', project_dir)
 
     for dirName in dirList:
         vDirSplit(dirName, cores)
