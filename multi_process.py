@@ -12,7 +12,7 @@ import pdb
 
 # --------------------------------------------------------------------
 
-def get_VSPACE(input_file, project_dir):
+def get_VSPACE(input_file,project_dir):
     destList = []
     os.chdir(project_dir)
     vsl = open(input_file, 'r')
@@ -170,8 +170,13 @@ def multiProcess(srcDir, cores):
 # --------------------------------------------------------------------
 
 def main():
-    cores = 1
-    dirList = get_VSPACE('vplanet-multiprocess/vspace_list', '/media/caitlyn/Data_Drive/Projects/IceBelt/')
+    project_dir = sys.argv[1]
+    cores = sys.argv[2]
+    if cores > mp.cpu_count():
+        print("Error: the cores given are above number of actual cores")
+        print("Actual amount of cores: " + str(mp.cpu_count()))
+
+    dirList = get_VSPACE('vplanet-multiprocess/vspace_list',project_dir)
 
     for dirName in dirList:
         vDirSplit(dirName, cores)
