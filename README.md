@@ -1,4 +1,4 @@
-# vplanet-multiprocess
+# Multi-Planet: using multiproccesing with Vplanet
 
 This program, dubbed 'Multi-Planet' works in conjuction with the Vpsace and Vplanet code found [here on Github](https://github.com/VirtualPlanetaryLaboratory/vplanet). 
 
