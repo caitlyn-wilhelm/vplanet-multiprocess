@@ -12,35 +12,34 @@ import pdb
 
 # --------------------------------------------------------------------
 
-def get_VSPACE(input_file,project_dir):
-    destList = []
-    os.chdir(project_dir)
-    vsl = open(input_file, 'r')
 
-    for line in vsl:
-        vspace_name = line.strip().split('/n')[0]
-        print(vspace_name)
-        vsf = open(vspace_name, 'r')
-        vspace_all = vsf.readlines()
-        check = vspace_all[3]
-        destLine = vspace_all[1]
-        destfolder = project_dir + destLine.strip().split(None, 1)[1]
-        destList.append(destfolder)
-        if "samplemode" in check:
-            os.system('vspace ' + vspace_name)
-            rand_dist(destfolder, vspace_name)
-        else:
-            os.system('vspace ' + vspace_name)
-        vsf.close()
-    vsl.close()
-    return destList
+def get_VSPACE(vspace_name, project_dir):
+    os.chdir(project_dir)
+    vsf = open(vspace_name, 'r')
+    vspace_all = vsf.readlines()
+    check = vspace_all[3]
+    destLine = vspace_all[1]
+    destfolder = project_dir + destLine.strip().split(None, 1)[1]
+
+    if "samplemode" in check:
+        os.system('vspace ' + vspace_name)
+        typ = "MC"
+    else:
+        os.system('vspace ' + vspace_name)
+        typ = "NM"
+
+    vsf.close()
+    return [destfolder, typ]
 
 # --------------------------------------------------------------------
 
+
 def rand_dist(folder_name, vspace_file):
     vspace = open(vspace_file, "r")
+
     for line in vspace:
         line.strip().split('/n')
+
         if line.startswith('seed '):
             seedline = line.split()
             seed = seedline[1]
@@ -60,6 +59,7 @@ def rand_dist(folder_name, vspace_file):
                 eccline = line.split()
                 ecc = float(eccline[1])
                 rng = 1 - ecc
+
                 if rng < ecc:
                     EccAmp = str(np.random.uniform(
                         low=np.float(0.01), high=np.float(rng)))
@@ -67,19 +67,20 @@ def rand_dist(folder_name, vspace_file):
                     EccAmp = str(np.random.uniform(
                         low=np.float(0.01), high=np.float(ecc)))
                 texteamp = "dEccAmp      " + EccAmp + "\n"
+                earth.write(texteamp + "\n")
 
             if line.startswith('dObliquity'):
                 oblline = line.split()
                 ObliqAmp = str(np.random.uniform(
                     low=np.float(5), high=np.float(oblline[1])))
                 textoblamp = "dObliqAmp       " + ObliqAmp + "\n"
+                earth.write(textoblamp + "\n")
 
-        earth.write(textoblamp)
-        earth.write(texteamp)
         earth.close()
         os.chdir("../../")
 
 # --------------------------------------------------------------------
+
 
 def vDirSplit(srcDir, cores=1):
     # cores is 1 no need to merge directories
@@ -107,6 +108,7 @@ def vDirSplit(srcDir, cores=1):
 
 # --------------------------------------------------------------------
 
+
 def moveAllFilesinDir(srcDir, dstDir):
     # Check if both the are directories
     if os.path.isdir(srcDir) and os.path.isdir(dstDir):
@@ -119,6 +121,7 @@ def moveAllFilesinDir(srcDir, dstDir):
 
 # --------------------------------------------------------------------
 
+
 def vDirMerge(srcDir, cores=1):
     # cores is 1 no need to merge directories
     if cores == 1:
@@ -127,63 +130,83 @@ def vDirMerge(srcDir, cores=1):
     for i in range(1, cores + 1):
         coreDir = srcDir + "_c" + str(i)
         moveAllFilesinDir(coreDir, srcDir)
+
         if len(os.listdir(coreDir)) == 0:
             os.rmdir(coreDir)
 
 # --------------------------------------------------------------------
 
-def run_vplanet(folder_name):
+
+def run_vplanet(folder_name, vspace_name, typ):
     final = '---- FINAL SYSTEM PROPERTIES ----'
+    if typ == "MC":
+        rand_dist(folder_name, vspace_name)
     # get number of files
     files = sub.check_output("find %s -maxdepth 1 -mindepth 1 -type d" % folder_name, shell=True).split()
+
     for f in files:
-        os.chdir(str(f).encode("utf-8"))
+        print(f)
+        os.chdir(f.decode('UTF-8'))
+
         if os.path.exists('tilted.log') == False:
             sub.call("vplanet vpl.in", shell=True)
         else:
             logf = open('tilted.log', 'r')
             lines = logf.readlines()
             logf.close()
+
             if final in lines:
                 pass
             else:
-                sub.call("vplanet vpl.in", shell= True)
+                sub.call("vplanet vpl.in", shell=True)
+
         os.chdir("../../")
 
 # --------------------------------------------------------------------
 
-def multiProcess(srcDir, cores):
+
+def multiProcess(srcDir, cores, vspaceName,typ):
     print(srcDir, cores)
+
     # Define an output queue
     output = mp.Queue()
+
     # Setup a list of processes that we want to run
     processes = []
-    for i  in range(1, cores+1):
+    for i in range(1, cores + 1):
         coreDir = srcDir + "_c" + str(i)
-        m = mp.Process(target=run_vplanet, args=(coreDir, ))
+        m = mp.Process(target=run_vplanet, args=(coreDir,vspaceName,typ))
         processes.append(m)
+
     # Run processes
     for p in processes:
         p.start()
+
     # Exit the completed processes
     for p in processes:
         p.join()
 
 # --------------------------------------------------------------------
 
+
 def main():
-    project_dir = sys.argv[1]
+    case_dir = sys.argv[1]
     cores = int(sys.argv[2])
+    vspaceName = "vspace.in"
 
-    dirList = get_VSPACE('vplanet-multiprocess/vspace_list', project_dir)
+    dirName = get_VSPACE(vspaceName, case_dir)
+    dir = dirName[0]
+    typ = dirName[1]
+    print(dir)
 
-    for dirName in dirList:
-        vDirSplit(dirName, cores)
-        if cores > 1:
-            multiProcess(dirName, cores)
-        else:
-            run_vplanet(dirName)
-        vDirMerge(dirName, cores)
+    vDirSplit(dir, cores)
+
+    if cores > 1:
+        multiProcess(dir, cores, vspaceName, typ)
+    else:
+        run_vplanet(dir, vspaceName, typ)
+
+    vDirMerge(dir, cores)
 
 if __name__ == "__main__":
     main()
