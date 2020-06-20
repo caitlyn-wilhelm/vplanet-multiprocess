@@ -14,7 +14,7 @@ This assumes you already have Vplanet installed and are familiar with the vspace
 
 ## Multi-Planet Formatting
 
-There are two separate options for running Multi-Planet: A singular case or a list of cases given by the user. Regardless, there is a specific type of format for the files for Multi-Planet to run smoothly. In each case, there should be a vspace file (think of it as the blueprint for Multi-Planet) like so:
+There are two separate options for running Multi-Planet: A singular case or a list of cases given by the user. Regardless, there is a specific type of format for the files for Multi-Planet to run smoothly. In each case, there should be a vspace file named `vspace.in` like so:
 
 ![Formatting Guide Image](https://github.com/caitlyn-wilhelm/vplanet-multiprocess/blob/master/docs/format_guide.png)
 
