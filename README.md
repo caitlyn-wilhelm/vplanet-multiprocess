@@ -1,11 +1,42 @@
 # Multi-Planet: using multiproccesing with Vplanet
 
-This program, dubbed 'Multi-Planet' works in conjuction with the Vpsace and Vplanet code found [here on Github](https://github.com/VirtualPlanetaryLaboratory/vplanet). 
+This program, dubbed 'Multi-Planet' works in conjuction with the Vplanet code found [here on Github](https://github.com/VirtualPlanetaryLaboratory/vplanet).
 
-In the vplanet-multiprocess directory, there is a file called `vspace_list`. This file is where you put the ***full path*** to where your vspace files are located, so multi-planet knows where they are. It does not matter if the vspace file is for parameter sweeps or Monte Carlo satistical runs, multi-planet works reguardless.
+## Installation of Multi-Planet
 
-multi-planet takes 2 arguments: The directory where you would like the vplanet files to be generated, and the number of cores (I reccomend using a small amount unless you have avery fast PC that can handle lots of computation power). After listing the vspace files in the `vspace_list` file, write the following command in the command line: 
+Multi-planet will work if installed like so:
 
 ```
-python vplanet-multiprocess.py [Project Directory] [number of cores]
+git clone https://github.com/caitlyn-wilhelm/vplanet-multiprocess
+```
+
+This assumes you already have Vplanet installed and are familiar with the vspace functionality.
+
+## Multi-Planet Formatting
+
+There are two separate options for running Multi-Planet: A singular case or a list of cases given by the user. Regardless, there is a specific type of format for the files for Multi-Planet to run smoothly. In each case, there should be a vspace file (think of it as the blueprint for Multi-Planet) like so:
+
+![Formatting Guide Image](https://github.com/caitlyn-wilhelm/vplanet-multiprocess/blob/master/docs/format-guide.png?raw=true)
+
+## Singular Case with Muli-Planet
+
+Using the singular case option with multi_planet is simple. Just run this line of code on the command line:
+
+```
+python multi_process.py [Case_Name] [Number of Cores]
+```
+
+### Multiple Cases with Multi-planet
+
+Let's say you have a list of cases to run. Inside the `vplanet/multiprocess` repo, there is file titled `multi_list.txt`. List the same arguments you would use for the singular case like so:
+```
+[Path to Case A] [Number of Cores]
+[Path to Case B] [Number of Cores]
+[Path to Case C] [Number of Cores]
+```
+
+After setting up the `multi_list.txt` file correctly, run the following line in the command line:
+
+```
+./wrapper.sh
 ```

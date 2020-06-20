@@ -49,7 +49,7 @@ def rand_dist(folder_name, vspace_file):
     files = sub.check_output(
         "find %s -maxdepth 1 -mindepth 1 -type d" % folder_name, shell=True).split()
     for f in files:
-        os.chdir(str(f).encode("utf-8"))
+        os.chdir(f.decode('UTF-8'))
         earth = open('earth.in', "r+")
 
         for line in earth:

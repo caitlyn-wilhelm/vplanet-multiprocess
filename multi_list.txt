@@ -1,0 +1,5 @@
+#This is an example as to how to set up the multi_list file#
+
+/media/caitlyn/Data_Drive/Projects/IceBelt/G_obl_stat/ 8
+/media/caitlyn/Data_Drive/Projects/IceBelt/F_obl_stat/ 8
+/media/caitlyn/Data_Drive/Projects/IceBelt/K_obl_stat/ 8
